@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Gửi Em Công Chúa Của Anh</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(to bottom, #ffc0cb, #ffe6f0);
+      font-family: 'Segoe UI', sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      flex-direction: column;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* Lung linh ánh sáng */
+    body::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: radial-gradient(#fff6fa 2px, transparent 2px);
+      background-size: 40px 40px;
+      opacity: 0.4;
+      animation: sparkle 4s linear infinite;
+      z-index: 0;
+    }
+
+    @keyframes sparkle {
+      from {
+        background-position: 0 0;
+      }
+      to {
+        background-position: 40px 40px;
+      }
+    }
+
+    .envelope-container {
+      position: relative;
+      width: 300px;
+      height: 200px;
+      background-color: #ff99cc;
+      border-radius: 10px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+      overflow: hidden;
+      transition: height 1s ease;
+      z-index: 1;
+    }
+
+    .flap {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100px;
+      background-color: #ff66b2;
+      clip-path: polygon(50% 0%, 100% 100%, 0% 100%);
+      z-index: 2;
+      transition: transform 0.6s ease;
+      transform-origin: top center;
+    }
+
+    .letter {
+      position: absolute;
+      top: 100px;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: white;
+      padding: 20px;
+      box-sizing: border-box;
+      overflow-y: auto;
+      opacity: 0;
+      transition: opacity 1s ease;
+      z-index: 1;
+      max-height: 0;
+    }
+
+    .envelope-container.open {
+      height: 400px;
+    }
+
+    .envelope-container.open .flap {
+      transform: rotateX(180deg);
+    }
+
+    .envelope-container.open .letter {
+      opacity: 1;
+      max-height: 400px;
+    }
+
+    .toggle-button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      background-color: #ff66b2;
+      border: none;
+      border-radius: 20px;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+      z-index: 1;
+    }
+
+    .toggle-button:hover {
+      background-color: #ff3385;
+    }
+
+    .heart {
+      position: absolute;
+      color: #ff3366;
+      font-size: 18px;
+      animation: fly 3s ease-out forwards;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    @keyframes fly {
+      0% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+      100% {
+        opacity: 0;
+        transform: translateY(-200px) scale(1.5);
+      }
+    }
+
+    /* Typing effect */
+    .typed-text {
+      white-space: pre-wrap;
+      animation: typing 1s steps(30, end);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Nhạc nền -->
+
+  <div class="envelope-container" id="envelope">
+    <div class="flap"></div>
+    <div class="letter" id="letter"></div>
+  </div>
+
+  <button class="toggle-button" id="toggle-btn">Mở / Đóng Thư</button>
+
+  <script>
+    const envelope = document.getElementById('envelope');
+    const toggleBtn = document.getElementById('toggle-btn');
+    const audio = document.getElementById('love-audio');
+    const letter = document.getElementById('letter');
+    let letterTyped = false;
+    let heartsInterval;
+
+    const message = `
+Gửi đến em công chủa nhỏ của anh!
+
+Hàng ngày anh vẫn đang học cách trở nên tử tế hơn, dịu dàng hơn, không chỉ để trở thành một người tốt hơn mà còn để trở thành một người xứng đáng với em - người con gái mà anh trân trọng.
+      Anh cố gắng để ý đến từng cảm xúc nhỏ của em, những điều em thích, những nỗi buồn em giấu cho đến cả những gì em im lặng mà chẳng nói gì.
+      Anh biết hiểu một người không phải là chuyện ngày một ngày hai, và anh cũng chưa bao giờ nghĩ rằng mình đã hiểu em hoàn toàn. Nhưng anh đang trên hành trình ấy, hành trình học cách lắng nghe, cảm nhận và thấu hiểu em từng chút một.
+      Cuộc sống này không hề dễ dàng, em đã phải mạnh mẽ rất nhiều để đi đến hôm nay. Vì thế, anh không muốn nhìn thấy em mệt mỏi nữa. Anh chỉ muốn là nơi em có thể tựa vào mỗi khi yếu lòng. Dù không thể thay em gánh hết những nhọc nhằn, anh hy vọng có thể cùng em bước tiếp và viết nên một câu chuyện thật đẹp của chúng ta.
+
+Yêu em công chúa nhỏ của anh😘💗!
+`;
+
+    toggleBtn.addEventListener('click', () => {
+      envelope.classList.toggle('open');
+
+      if (envelope.classList.contains('open')) {
+        if (!letterTyped) {
+          typeText(message, letter);
+          letterTyped = true;
+        }
+        audio.play();
+      } else {
+        audio.pause();
+        audio.currentTime = 0;
+      }
+    });
+
+    function typeText(text, container, speed = 30) {
+      container.innerHTML = '';
+      let i = 0;
+      const interval = setInterval(() => {
+        container.innerHTML += text[i];
+        i++;
+        if (i >= text.length) {
+          clearInterval(interval);
+        }
+      }, speed);
+    }
+
+    function createHearts() {
+      const heart = document.createElement('div');
+      heart.classList.add('heart');
+      heart.innerHTML = '♥';
+      heart.style.left = Math.random() * window.innerWidth + 'px';
+      heart.style.bottom = '0px';
+      heart.style.fontSize = Math.random() * 20 + 10 + 'px';
+      document.body.appendChild(heart);
+
+      setTimeout(() => {
+        heart.remove();
+      }, 3000);
+    }
+
+    // Tạo hiệu ứng tim bay liên tục
+    setInterval(createHearts, 500);
+  </script>
+
+</body>
+</html>
